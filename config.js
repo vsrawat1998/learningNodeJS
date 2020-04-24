@@ -2,7 +2,7 @@
 
 // Container for all the environments
 
-var environments = {
+const environments = {
     // Staging (default) environment
     staging: {
         httpPort: 3000,
@@ -19,14 +19,14 @@ var environments = {
 
 // Determine which should be exported on the basis of the command-line arguement
 
-var currentEnvironment =
+const currentEnvironment =
     typeof process.env.NODE_ENV == 'string'
         ? process.env.NODE_ENV.toLowerCase().trim()
         : '';
 
-var environmentToExport =
+const environment =
     typeof environments[currentEnvironment] == 'object'
         ? environments[currentEnvironment]
         : environments.staging;
 
-module.exports = environmentToExport;
+export default environment;

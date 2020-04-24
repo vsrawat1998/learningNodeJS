@@ -2,39 +2,39 @@ import http from 'http';
 import https from 'https';
 import { parse } from 'url';
 import { StringDecoder } from 'string_decoder';
-import { httpPort, httpsPort, envName } from './config';
+import environment from './config';
 import { readFileSync } from 'fs';
 
 // Instantiate HTTP server
-var httpsServerOptions = {
+const httpsServerOptions = {
     key: readFileSync('./https/key.pem'),
     cert: readFileSync('./https/cert.pem')
 };
-var httpServer = http.createServer(httpsServerOptions, (req, res) => {
+const httpServer = http.createServer(httpsServerOptions, (req, res) => {
     unifiedServer(req, res);
 });
 
 // Start the server
-httpServer.listen(httpPort, () => {
+httpServer.listen(environment.httpPort, () => {
     console.log(
-        `HTTP Server listening on port ${httpPort} in ${envName} mode!`
+        `HTTP Server listening on port ${environment.httpPort} in ${environment.envName} mode!`
     );
 });
 
 // Instantiate HTTPS server
-var httpsServer = https.createServer((req, res) => {
+const httpsServer = https.createServer((req, res) => {
     unifiedServer(req, res);
 });
 
 // Start the server
-httpsServer.listen(httpsPort, () => {
+httpsServer.listen(environment.httpsPort, () => {
     console.log(
-        `HTTPS Server listening on port ${httpsPort} in ${envName} mode!`
+        `HTTPS Server listening on port ${environment.httpsPort} in ${environment.envName} mode!`
     );
 });
 
 // Add the server logic for both http and https
-var unifiedServer = (req, res) => {
+const unifiedServer = (req, res) => {
     // Get and parse the url
     const parsedUrl = parse(req.url, true);
 
@@ -45,15 +45,15 @@ var unifiedServer = (req, res) => {
     const queryStringObject = parsedUrl.query;
 
     // Get the HTTP method
-    var method = req.method.toLowerCase();
+    const method = req.method.toLowerCase();
 
     // Get the headers as an object
-    var headers = req.headers;
+    const headers = req.headers;
 
     // Get the payload, if any
 
-    var decoder = new StringDecoder('utf-8');
-    var buffer = '';
+    const decoder = new StringDecoder('utf-8');
+    const buffer = '';
     req.on('data', (data) => {
         buffer += decoder.write(data);
     });
@@ -64,13 +64,13 @@ var unifiedServer = (req, res) => {
         // Choose the handler this request should go to,
         // if one is not found choose the notFound handler
 
-        var chosenHandler =
+        const chosenHandler =
             typeof router[trimmedPath] !== 'undefined'
                 ? router[trimmedPath]
                 : handlers.notFound;
 
         // Construct data object to send to the handler
-        var data = {
+        const data = {
             trimmedPath: trimmedPath,
             queryStringObject: queryStringObject,
             headers: headers,
@@ -86,7 +86,7 @@ var unifiedServer = (req, res) => {
             payload = typeof payload === 'object' ? payload : {};
 
             // Convert the payload to string
-            var payloadString = JSON.stringify(payload);
+            const payloadString = JSON.stringify(payload);
 
             // Return the response
             res.setHeader('Content-Type', 'application/json');
@@ -111,6 +111,6 @@ const handlers = {
     }
 };
 
-var router = {
+const router = {
     ping: handlers.ping
 };
