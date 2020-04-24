@@ -1,17 +1,46 @@
-import { createServer } from 'http';
-import url from 'url';
-import { StringDecoder as stringDecoder } from 'string_decoder';
-import { port, envName } from './config';
-// Server must respond to all requests
-// console.log(process.env.NODE_ENV);
-var server = createServer((req, res) => {
+import http from 'http';
+import https from 'https';
+import { parse } from 'url';
+import { StringDecoder } from 'string_decoder';
+import { httpPort, httpsPort, envName } from './config';
+import { readFileSync } from 'fs';
+
+// Instantiate HTTP server
+var httpsServerOptions = {
+    key: readFileSync('./https/key.pem'),
+    cert: readFileSync('./https/cert.pem')
+};
+var httpServer = http.createServer(httpsServerOptions, (req, res) => {
+    unifiedServer(req, res);
+});
+
+// Start the server
+httpServer.listen(httpPort, () => {
+    console.log(
+        `HTTP Server listening on port ${httpPort} in ${envName} mode!`
+    );
+});
+
+// Instantiate HTTPS server
+var httpsServer = https.createServer((req, res) => {
+    unifiedServer(req, res);
+});
+
+// Start the server
+httpsServer.listen(httpsPort, () => {
+    console.log(
+        `HTTPS Server listening on port ${httpsPort} in ${envName} mode!`
+    );
+});
+
+// Add the server logic for both http and https
+var unifiedServer = (req, res) => {
     // Get and parse the url
     const parsedUrl = parse(req.url, true);
 
     // Get the path
     const path = parsedUrl.pathname;
-    const trimmedPath = path.replace(/^\/+|\/+$/g, '');
-
+    const trimmedPath = path.replace(/^\/+|\/+$/g, '').trim();
     // Get the query string as an object
     const queryStringObject = parsedUrl.query;
 
@@ -23,7 +52,7 @@ var server = createServer((req, res) => {
 
     // Get the payload, if any
 
-    var decoder = new stringDecoder('utf-8');
+    var decoder = new StringDecoder('utf-8');
     var buffer = '';
     req.on('data', (data) => {
         buffer += decoder.write(data);
@@ -70,26 +99,18 @@ var server = createServer((req, res) => {
             );
         });
     });
-});
-
-server.listen(port, () => {
-    console.log(`Server listening on port ${port} in ${envName} mode!`);
-});
-
-// Define a request router
-var handlers = {};
-
-// Sample handler
-handlers.sample = (data, callback) => {
-    // Callback a http status code, and a payload object
-    callback(406, { name: 'sample handler' });
 };
 
-// Not found handler
-handlers.notFound = (data, callback) => {
-    callback(404);
+// Define a request router
+const handlers = {
+    ping: (data, callback) => {
+        callback(200);
+    },
+    notFound: (data, callback) => {
+        callback(404);
+    }
 };
 
 var router = {
-    sample: handlers.sample
+    ping: handlers.ping
 };

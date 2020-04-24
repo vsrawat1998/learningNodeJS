@@ -5,12 +5,14 @@
 var environments = {
     // Staging (default) environment
     staging: {
-        port: 3000,
+        httpPort: 3000,
+        httpsPort: 3001,
         envName: 'staging'
     },
     // Production environment
     production: {
-        port: 8000,
+        httpPort: 8000,
+        httpsPort: 8001,
         envName: 'production'
     }
 };
