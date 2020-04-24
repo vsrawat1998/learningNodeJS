@@ -1,6 +1,5 @@
 node_modules/
 https/
 .data/
-lib/
 package-lock.json
 settings.json
