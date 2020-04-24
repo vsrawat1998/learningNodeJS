@@ -1,0 +1,14 @@
+{
+    "version": "0.0.1",
+    "main": "index.js",
+    "scripts": {
+        "start": "SET NODE_ENV=staging & babel-node index.js",
+        "start_prod": "SET NODE_ENV=production & babel-node index.js"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.9.0",
+        "@babel/node": "^7.8.7",
+        "@babel/preset-env": "^7.9.5",
+        "prettier": "2.0.5"
+    }
+}
