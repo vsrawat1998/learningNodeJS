@@ -2,8 +2,9 @@ import http from 'http';
 import https from 'https';
 import { parse } from 'url';
 import { StringDecoder } from 'string_decoder';
-import environment from './config';
+import { httpPort, httpsPort, envName } from './config';
 import { readFileSync } from 'fs';
+import handlers from './lib/handlers';
 
 // Instantiate HTTP server
 const httpsServerOptions = {
@@ -15,9 +16,9 @@ const httpServer = http.createServer(httpsServerOptions, (req, res) => {
 });
 
 // Start the server
-httpServer.listen(environment.httpPort, () => {
+httpServer.listen(httpPort, () => {
     console.log(
-        `HTTP Server listening on port ${environment.httpPort} in ${environment.envName} mode!`
+        `HTTP Server listening on port ${httpPort} in ${envName} mode!`
     );
 });
 
@@ -27,9 +28,9 @@ const httpsServer = https.createServer((req, res) => {
 });
 
 // Start the server
-httpsServer.listen(environment.httpsPort, () => {
+httpsServer.listen(httpsPort, () => {
     console.log(
-        `HTTPS Server listening on port ${environment.httpsPort} in ${environment.envName} mode!`
+        `HTTPS Server listening on port ${httpsPort} in ${envName} mode!`
     );
 });
 
@@ -102,15 +103,7 @@ const unifiedServer = (req, res) => {
 };
 
 // Define a request router
-const handlers = {
-    ping: (data, callback) => {
-        callback(200);
-    },
-    notFound: (data, callback) => {
-        callback(404);
-    }
-};
-
 const router = {
-    ping: handlers.ping
+    ping: handlers.ping,
+    users: handlers.users
 };

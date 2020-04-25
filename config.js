@@ -24,9 +24,9 @@ const currentEnvironment =
         ? process.env.NODE_ENV.toLowerCase().trim()
         : '';
 
-const environment =
+const environmentToExport =
     typeof environments[currentEnvironment] == 'object'
         ? environments[currentEnvironment]
         : environments.staging;
 
-export default environment;
+export const { httpPort, httpsPort, envName } = environmentToExport;
