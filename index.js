@@ -2,9 +2,10 @@ import http from 'http';
 import https from 'https';
 import { parse } from 'url';
 import { StringDecoder } from 'string_decoder';
-import { httpPort, httpsPort, envName } from './config';
+import { httpPort, httpsPort, envName } from './lib/config';
 import { readFileSync } from 'fs';
 import handlers from './lib/handlers';
+import { parseJsonToObject } from './lib/helpers';
 
 // Instantiate HTTP server
 const httpsServerOptions = {
@@ -53,8 +54,8 @@ const unifiedServer = (req, res) => {
 
     // Get the payload, if any
 
-    const decoder = new StringDecoder('utf-8');
-    const buffer = '';
+    var decoder = new StringDecoder('utf-8');
+    var buffer = '';
     req.on('data', (data) => {
         buffer += decoder.write(data);
     });
@@ -72,11 +73,11 @@ const unifiedServer = (req, res) => {
 
         // Construct data object to send to the handler
         const data = {
-            trimmedPath: trimmedPath,
-            queryStringObject: queryStringObject,
-            headers: headers,
-            method: method,
-            payload: buffer
+            trimmedPath,
+            queryStringObject,
+            headers,
+            method,
+            payload: parseJsonToObject(buffer)
         };
 
         // Route the request to the handler specified in the router
@@ -105,5 +106,6 @@ const unifiedServer = (req, res) => {
 // Define a request router
 const router = {
     ping: handlers.ping,
-    users: handlers.users
+    users: handlers.users,
+    tokens: handlers.tokens
 };
